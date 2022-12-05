@@ -33,13 +33,19 @@ jobs:
       - run: dotnet build src/blackjack-events-library.sln -c Release /p:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} /p:FileVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} /p:InformationalVersion=${{ steps.gitversion.outputs.Sha }}
       - run: dotnet test src/blackjack-events-library.sln
       - run: dotnet pack src/BlackJack.Events/BlackJack.Events.csproj -c Release -p:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} -p:FileVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} -p:InformationalVersion=${{ steps.gitversion.outputs.Sha }} -p:PackageVersion=${{ steps.gitversion.outputs.MajorMinorPatch }}
+      - run: dotnet pack src/BlackJack.Events.Abstractions/BlackJack.Events.Abstractions.csproj -c Release -p:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} -p:FileVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} -p:InformationalVersion=${{ steps.gitversion.outputs.Sha }} -p:PackageVersion=${{ steps.gitversion.outputs.MajorMinorPatch }}
       - name: Publish Artifact
         uses: actions/upload-artifact@v2
         with:
           name: nuget-package
           path: src/BlackJack.Events/bin/Release/*${{ steps.gitversion.outputs.MajorMinorPatch }}.nupkg
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget-package-abstractions
+          path: src/BlackJack.Events/bin/Release/*${{ steps.gitversion.outputs.MajorMinorPatch }}.nupkg
 
-  deploy:
+  deploy-core:
     needs: [build]
     runs-on: ubuntu-latest
     name: Deploy NuGet Package
@@ -51,6 +57,22 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: nuget-package
+          path: ./package
+      - name: Publish
+        run: nuget push package/*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+
+  deploy-abstractions:
+    needs: [build]
+    runs-on: ubuntu-latest
+    name: Deploy NuGet Package
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-package-abstractions
           path: ./package
       - name: Publish
         run: nuget push package/*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
