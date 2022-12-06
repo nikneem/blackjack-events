@@ -5,8 +5,8 @@ namespace BlackJack.Events.Events;
 
 public class TableCreatedEvent : IBlackJackEvent<TableCreatedEventData>
 {
-    public string EventSource => "/cloudevents/blackjack/sessions";
-    public string EventType => "Session.Created";
+    public string EventSource { get; set; }= "/cloudevents/blackjack/sessions";
+    public string EventType { get; set; } = "Session.Created";
     public TableCreatedEventData Data { get; set; } = null!;
 
 
