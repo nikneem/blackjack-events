@@ -9,9 +9,6 @@ public class TableCreatedEvent : IBlackJackEvent<TableCreatedEventData>
     public string EventType { get; set; } = "Session.Created";
     public TableCreatedEventData Data { get; set; } = null!;
 
-
-    private TableCreatedEvent(){}
-
     public static TableCreatedEvent Create(Guid userId, Guid sessionId)
     {
         var data = new TableCreatedEventData
