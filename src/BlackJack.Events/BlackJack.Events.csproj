@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Events\" />
     <Folder Include="EventData\" />
     <Folder Include="Configuration\" />
+    <Folder Include="Events\Sessions\" />
     <Folder Include="Sender\" />
   </ItemGroup>
 
