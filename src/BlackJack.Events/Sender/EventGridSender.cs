@@ -1,5 +1,4 @@
-﻿using Azure.Messaging;
-using Azure.Messaging.EventGrid;
+﻿using Azure.Messaging.EventGrid;
 using BlackJack.Events.Abstractions.Events;
 using BlackJack.Events.Abstractions.Sender;
 using Microsoft.Extensions.Logging;
@@ -13,13 +12,15 @@ public class EventGridSender: IEventGridSender
 
     public async Task<bool> SendEventAsync(IBlackJackEvent blackJackEvent)
     {
-        var cloudEvent = new CloudEvent(blackJackEvent.EventSource, blackJackEvent.EventType, null);
+        _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
+        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, "1", null);
         var response = await _client.SendEventAsync(cloudEvent);
         return !response.IsError;
     }
     public async Task<bool> SendEventAsync<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
     {
-        var cloudEvent = new CloudEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Data);
+        _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
+        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, "1", blackJackEvent);
         var response = await _client.SendEventAsync(cloudEvent);
         return !response.IsError;
     }
