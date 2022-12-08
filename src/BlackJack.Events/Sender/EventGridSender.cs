@@ -20,7 +20,7 @@ public class EventGridSender: IEventGridSender
     }
     public async Task<bool> SendEventAsync<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
     {
-        _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
+        _logger.LogInformation("Broadcasting event grid message {msg}", JsonConvert.SerializeObject( blackJackEvent));
         var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Version, BinaryData.FromObjectAsJson(blackJackEvent.Data));
         cloudEvent.Data = BinaryData.FromObjectAsJson(blackJackEvent.Data);
         _logger.LogInformation("EventGridEvent with data {event}", JsonConvert.SerializeObject(cloudEvent));
