@@ -2,6 +2,7 @@
 using BlackJack.Events.Abstractions.Events;
 using BlackJack.Events.Abstractions.Sender;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BlackJack.Events.Sender;
 
@@ -21,6 +22,7 @@ public class EventGridSender: IEventGridSender
     {
         _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
         var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Version, blackJackEvent);
+        _logger.LogInformation("EventGridEvent {event}", JsonConvert.SerializeObject(cloudEvent));
         var response = await _client.SendEventAsync(cloudEvent);
         return !response.IsError;
     }
