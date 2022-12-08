@@ -13,14 +13,14 @@ public class EventGridSender: IEventGridSender
     public async Task<bool> SendEventAsync(IBlackJackEvent blackJackEvent)
     {
         _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
-        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, "1", null);
+        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Version, null);
         var response = await _client.SendEventAsync(cloudEvent);
         return !response.IsError;
     }
     public async Task<bool> SendEventAsync<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
     {
         _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
-        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, "1", blackJackEvent);
+        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Version, blackJackEvent);
         var response = await _client.SendEventAsync(cloudEvent);
         return !response.IsError;
     }
