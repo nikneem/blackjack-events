@@ -26,6 +26,7 @@ public class EventGridSender: IEventGridSender
             blackJackEvent.EventType, 
             blackJackEvent.Version,
             JsonConvert.SerializeObject(blackJackEvent.Data));
+
         _logger.LogInformation("EventGridEvent with data {event}", JsonConvert.SerializeObject(cloudEvent));
 
         var response = await _client.SendEventAsync(cloudEvent);
