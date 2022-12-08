@@ -22,7 +22,9 @@ public class EventGridSender: IEventGridSender
     {
         _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
         var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Version, BinaryData.FromObjectAsJson(blackJackEvent.Data));
-        _logger.LogInformation("EventGridEvent {event}", JsonConvert.SerializeObject(cloudEvent));
+        cloudEvent.Data = BinaryData.FromObjectAsJson(blackJackEvent.Data);
+        _logger.LogInformation("EventGridEvent with data {event}", JsonConvert.SerializeObject(cloudEvent));
+
         var response = await _client.SendEventAsync(cloudEvent);
         return !response.IsError;
     }
