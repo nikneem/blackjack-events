@@ -31,12 +31,12 @@ public class EventGridSender: IEventGridSender
 
     private EventGridEvent ToEventGridEvent<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
     {
-        var jsonData = JsonSerializer.Serialize(blackJackEvent.Data);
+        //var jsonData = JsonSerializer.Serialize();
         return new EventGridEvent(
             blackJackEvent.EventSource,
             blackJackEvent.EventType,
             blackJackEvent.Version,
-            jsonData);
+            blackJackEvent.Data);
     }
     private EventGridEvent ToEventGridEvent(IBlackJackEvent blackJackEvent)
     {
