@@ -1,8 +1,8 @@
 ﻿using BlackJack.Events.Abstractions.Events;
 
-namespace BlackJack.Events.Events
+namespace BlackJack.Events
 {
-    public abstract class BlackJackEvent<TEventData>: IBlackJackEvent<TEventData>
+    public abstract class BlackJackEvent<TEventData> : IBlackJackEvent<TEventData>
     {
         public abstract string EventSource { get; set; }
         public abstract string EventType { get; set; }

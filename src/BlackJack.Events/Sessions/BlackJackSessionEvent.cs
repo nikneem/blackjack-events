@@ -1,4 +1,4 @@
-﻿namespace BlackJack.Events.Events.Sessions;
+﻿namespace BlackJack.Events.Sessions;
 
 public abstract class BlackJackSessionEvent<TEventData> : BlackJackEvent<TEventData>
 {

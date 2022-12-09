@@ -1,8 +1,8 @@
-﻿using Azure.Messaging.EventGrid;
+﻿using System.Text.Json;
+using Azure.Messaging.EventGrid;
 using BlackJack.Events.Abstractions.Events;
 using BlackJack.Events.Abstractions.Sender;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace BlackJack.Events.Sender;
 
@@ -11,26 +11,40 @@ public class EventGridSender: IEventGridSender
     private readonly EventGridPublisherClient _client;
     private readonly ILogger<EventGridSender> _logger;
 
-    public async Task<bool> SendEventAsync(IBlackJackEvent blackJackEvent)
+    public Task<bool> SendEventAsync(IBlackJackEvent blackJackEvent)
     {
-        _logger.LogInformation("Broadcasting event grid message {msg}", blackJackEvent);
-        var cloudEvent = new EventGridEvent(blackJackEvent.EventSource, blackJackEvent.EventType, blackJackEvent.Version, null);
-        var response = await _client.SendEventAsync(cloudEvent);
+        var eventGridEvent = ToEventGridEvent(blackJackEvent);
+        return PublishEvent(eventGridEvent);
+    }
+    public Task<bool> SendEventAsync<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
+    {
+        var eventGridEvent = ToEventGridEvent(blackJackEvent);
+        return PublishEvent(eventGridEvent);
+    }
+
+    private async Task<bool> PublishEvent(EventGridEvent evt)
+    {
+        _logger.LogInformation("Publishing event grid event {eventType}", evt.EventType);
+        var response = await _client.SendEventAsync(evt);
         return !response.IsError;
     }
-    public async Task<bool> SendEventAsync<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
+
+    private EventGridEvent ToEventGridEvent<TEventData>(IBlackJackEvent<TEventData> blackJackEvent)
     {
-        _logger.LogInformation("Broadcasting event grid message {msg}", JsonConvert.SerializeObject( blackJackEvent));
-        var cloudEvent = new EventGridEvent(
-            blackJackEvent.EventSource, 
-            blackJackEvent.EventType, 
+        var jsonData = JsonSerializer.Serialize(blackJackEvent.Data);
+        return new EventGridEvent(
+            blackJackEvent.EventSource,
+            blackJackEvent.EventType,
             blackJackEvent.Version,
-            JsonConvert.SerializeObject(blackJackEvent.Data));
-
-        _logger.LogInformation("EventGridEvent with data {event}", JsonConvert.SerializeObject(cloudEvent));
-
-        var response = await _client.SendEventAsync(cloudEvent);
-        return !response.IsError;
+            jsonData);
+    }
+    private EventGridEvent ToEventGridEvent(IBlackJackEvent blackJackEvent)
+    {
+        return new EventGridEvent(
+            blackJackEvent.EventSource,
+            blackJackEvent.EventType,
+            blackJackEvent.Version,
+            null);
     }
 
     internal EventGridSender(EventGridPublisherClient client, ILogger<EventGridSender> logger)
