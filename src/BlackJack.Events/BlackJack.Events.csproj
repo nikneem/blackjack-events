@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Configuration\" />
+    <Folder Include="Games\EventData\" />
     <Folder Include="Players\EventData\" />
     <Folder Include="Sender\" />
   </ItemGroup>
